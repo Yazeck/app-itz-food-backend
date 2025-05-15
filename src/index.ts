@@ -1,25 +1,27 @@
+// src/index.ts
 import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import 'dotenv/config';
 import mongoose from 'mongoose';
 import morgan from 'morgan';
 import userRoutes from './routes/userRoutes';
-import { jwtCheck, jwtParse } from './middleware/auth'; // Ajusta según tu estructura
+import { jwtCheck, jwtParse } from './middleware/auth';
 
 const app = express();
 
-// 📦 Conexión a MongoDB
+// 📦 Conexión a la base de datos
 mongoose.connect(process.env.DB_CONNECTION_STRING as string)
   .then(() => console.log("✅ Base de datos conectada"))
   .catch((err) => console.error("❌ Error de conexión:", err));
 
 // 🌍 Configuración de CORS
+const allowedOrigins = [
+  'http://localhost:5173',
+  'https://app-itz-food-frontend-85a1.onrender.com'
+];
+
 const corsOptions: cors.CorsOptions = {
   origin: function (origin, callback) {
-    const allowedOrigins = [
-      'http://localhost:5173',
-      'https://app-itz-food-frontend-85a1.onrender.com'
-    ];
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
@@ -32,15 +34,15 @@ const corsOptions: cors.CorsOptions = {
   allowedHeaders: ['Authorization', 'Content-Type']
 };
 
-// 🛡️ Middleware: CORS DEBE IR PRIMERO
+// 🛡️ Middleware de CORS (DEBE IR PRIMERO)
 app.use(cors(corsOptions));
-app.options('*', cors(corsOptions)); // preflight
+app.options('*', cors(corsOptions));
 
-// 🧩 Middlewares básicos
+// 🧩 Middlewares base
 app.use(express.json());
 app.use(morgan('dev'));
 
-// 🧪 Debug de autenticación y origen
+// 🧪 Debug headers
 app.use((req, res, next) => {
   console.log("🌐 Origin:", req.headers.origin);
   console.log("🔐 Auth Header:", req.headers.authorization);
@@ -48,31 +50,30 @@ app.use((req, res, next) => {
 });
 
 // 🩺 Ruta de prueba
-app.get('/health', (req: Request, res: Response) => {
+app.get('/health', (_req: Request, res: Response) => {
   res.send({ message: 'servidor ok' });
 });
 
-app.get('/', (req: Request, res: Response) => {
+app.get('/', (_req: Request, res: Response) => {
   res.redirect('/health');
 });
 
 // 👤 Rutas protegidas
 app.use("/api/user", jwtCheck, jwtParse, userRoutes);
 
-// ❗ Middleware de errores
-app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+// ⚠️ Middleware de manejo de errores
+app.use(function (err: Error & { status?: number }, _req: Request, res: Response, _next: NextFunction) {
   console.error("🔥 Error atrapado en middleware:", err.message);
-
   if (err.message === "Not allowed by CORS") {
-    return res.status(403).json({ error: "CORS no permitido" });
+    res.status(403).json({ error: "CORS no permitido" });
+    return;
   }
-
-  return res.status(err.status || 500).json({
+  res.status(err.status || 500).json({
     error: err.message || "Error interno del servidor"
   });
 });
 
-// 🚀 Iniciar servidor
+// 🚀 Inicio del servidor
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`🚀 Servidor corriendo en puerto ${PORT}`);
