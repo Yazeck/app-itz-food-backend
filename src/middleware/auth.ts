@@ -28,7 +28,7 @@ const {authorization} = req.headers;
 //con bearer
 if(!authorization || !authorization.startsWith('Bearer ' )){
   console.log("jwtPare -Authorizcion denegada")
-  return res.sendStatus(401).json({message: 'autorizacion denegada'})
+  return res.status(401).json({message: 'autorizacion denegada'})
 }//fin de if authorization
 //obtenemos el token del header
 //Bearer 1234xeslfdkadkñs
@@ -48,7 +48,7 @@ try{
   const user = await User.findOne({ auth0Id: auth0 });
   if(!user){
     console.log("jwtParse - !usuario find autorizacion denegada");
-    return res.sendStatus(401).json({message: 'usuario no encontrado'})
+    return res.status(401).json({message: 'usuario no encontrado'})
   }
   req.auth0Id = auth0 as string;
   req.userId = user._id.toString();
@@ -57,6 +57,6 @@ try{
 
 }catch(error){
   console.log("jwtParse - error al decodificar el token");
-  return res.sendStatus(401).json({message: 'token no valido'})
+  return res.status(401).json({message: 'token no valido'})
 }//fin de try-catch
 }//fin del jwtParse
