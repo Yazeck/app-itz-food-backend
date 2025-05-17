@@ -11,7 +11,7 @@ const upload = multer({
  });
 
  //Rutas para el restaurante
- router.post('/create', upload.single("imageFile"), createRestaurante)
+ router.post('/', upload.single("imageFile"), createRestaurante)
 
  export default router;
  
