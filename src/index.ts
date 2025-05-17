@@ -13,6 +13,12 @@ mongoose.connect(process.env.DB_CONNECTION_STRING as string)
   .then(() => {
     console.log("✅ Base de datos conectada");
   });
+  console.log("🧪 CLOUDINARY VARS:", {
+  name: process.env.CLOUDINARY_CLOUD_NAME,
+  key: process.env.CLOUDINARY_API_KEY,
+  secret: process.env.CLOUDINARY_API_SECRET
+});
+
 
   //CONFIGURACION DE CLOUDINARY
   cloudinary.config({
