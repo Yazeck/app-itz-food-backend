@@ -7,6 +7,9 @@ import mongoose from "mongoose";
 //funcion para crear un restaurante
 export const createRestaurante = async (req: Request, res: Response) => {
     try{
+        console.log("Body:", req.body);
+    console.log("File:", req.file);
+    console.log("User ID:", req.userId);
 const existinfRestaurante = await Restaurante.findOne({ user: req.userId });
         if(existinfRestaurante){
             res.status (500)

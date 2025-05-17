@@ -76,10 +76,10 @@ app.use((err: any, req: Request, res: Response, next: Function) => {
     res.status(500).json({ error: err.message });
   }
 });
-const router = Router();
+//const router = Router();
 
-router.post('/', (req: Request, res: Response) => {
-  res.json({ mensaje: 'POST en /', body: req.body });
-});
+//router.post('/', (req: Request, res: Response) => {
+  //res.json({ mensaje: 'POST en /', body: req.body });
+//});
 
-export default router;
+//export default router;
